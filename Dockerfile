@@ -1,18 +1,12 @@
-FROM buildpack-deps:{{ env.codename }}-curl
+FROM node:7-onbuild
 
-# procps is very common in build systems, and is a reasonably small package
-RUN apt-get update && apt-get install -y --no-install-recommends \
-{{
-if [
-	"bionic", "focal", "groovy", "xenial"
-] | index(env.codename) then (
--}}
-		bzr \
-{{ ) else "" end -}}
-		git \
-		mercurial \
-		openssh-client \
-		subversion \
-		\
-		procps \
-	&& rm -rf /var/lib/apt/lists/*
+# set maintainer
+LABEL maintainer "academy@release.works"
+
+# set a health check
+HEALTHCHECK --interval=5s \
+            --timeout=5s \
+            CMD curl -f http://127.0.0.1:8000 || exit 1
+
+# tell docker what port to expose
+EXPOSE 8000
